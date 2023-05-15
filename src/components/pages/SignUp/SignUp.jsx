@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { AuthContext } from "../../../provider/AuthProvider";
 
 const SignUp = () => {
-  const {createUser}=useContext(AuthContext)
+  const {createUser,logOut}=useContext(AuthContext)
     const handleSignup = e => {
       e.preventDefault();
       const form = e.target 
@@ -16,7 +16,9 @@ const SignUp = () => {
       console.log(name, email, password)
       createUser(email, password)
         .then(result => {
+          form.reset();
           const user = result.user 
+          logOut()
           console.log(user)
         })
         .catch(err => {
