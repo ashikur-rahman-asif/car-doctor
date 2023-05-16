@@ -1,9 +1,12 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import img from '../../../assets/images/login/login.svg'
 import { useContext } from 'react';
 import { AuthContext } from '../../../provider/AuthProvider';
 const Login = () => {
-  const {signIn}=useContext(AuthContext)
+  const { signIn } = useContext(AuthContext)
+  const location = useLocation()
+  const from = location.state?.from?.pathname || '/' 
+  const navigate=useNavigate()
   const handleLogin = e => {
     e.preventDefault();
     const form = e.target 
@@ -15,7 +18,26 @@ const Login = () => {
       .then(result => {
         const user = result.user 
         form.reset();
-        console.log(user)
+        const loggedUser = {
+          email: user.email 
+          
+        }
+        console.log(loggedUser)
+       
+        fetch('http://localhost:5000/jwt', {
+          method: 'POST',
+          headers: {
+            'content-type':'application/json'
+          },
+          body: JSON.stringify(loggedUser)
+        })
+          .then(res => res.json())
+          .then(data => {
+            console.log('jwt response', data)
+            //warning: LOcal Storage is not the best place to store the access token, It's the second best option
+            localStorage.setItem('car-access-token', data.token)
+             navigate(from,{replace:true})
+        })
       })
       .catch(err => {
       console.log(err)
@@ -48,7 +70,7 @@ const Login = () => {
                 <span className="label-text">Password</span>
               </label>
               <input
-                  type="text"
+                  type="password"
                   name='password'
                 placeholder="password"
                 className="input input-bordered"
